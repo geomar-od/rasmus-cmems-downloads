@@ -50,7 +50,13 @@ Analogously, the directories contain for every time step a csv file with the nam
 
 To initiate an automated data retrieval, copy the `.sh` and `.py` files to the desired output directory, and make sure they are executable (`chmod +x  <name_file.sh>`).
 
-Then run
+Set environment variables containing your CMEMS credentials:
+```shell
+export MOTU_USER="XXXXXXXXXXXXXXXX"
+export MOTU_PASSWORD="XXXXXXXXXXXXXXXXX"
+```
+
+Then run (from the same shell)
 ```shell
 ./MotuClCallPhysModel.sh 
 ./MotuClCallWaveModel.sh 
