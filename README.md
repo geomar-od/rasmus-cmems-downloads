@@ -71,4 +71,46 @@ python NetCDF2CSVWaveModel.py
 
 ## Usage with Docker
 
-_**TODO**: Provide two docker files with the environment necessary for downloading and for converting the data._
+First, build the container images with:
+```shell
+docker build -t cmems_motupy - < Dockerfile_MotuCl
+docker build -t cmems_netcdf2csv - < Dockerfile_NetCDF2CSV
+```
+
+Set environment variables containing your CMEMS credentials:
+```shell
+export MOTU_USER="XXXXXXXXXXXXXXXX"
+export MOTU_PASSWORD="XXXXXXXXXXXXXXXXX"
+```
+
+Then, run the download steps with
+```shell
+docker run -it --rm \
+    -e MOTU_USER -e MOTU_PASSWORD \
+    -v $PWD:/work -w /work \
+    cmems_motupy \
+    ./MotuClCallPhysModel.sh
+```
+and
+```shell
+docker run -it --rm \
+    -e MOTU_USER -e MOTU_PASSWORD\
+    -v $PWD:/work -w /work \
+    cmems_motupy \
+    ./MotuClCallWaveModel.sh
+```
+
+And finally, run the conversion steps with
+```shell
+docker run -it --rm \
+    -v $PWD:/work -w /work \
+    cmems_netcdf2csv \
+    python NetCDF2CSVPhysModel.py
+```
+and
+```shell
+docker run -it --rm \
+    -v $PWD:/work -w /work \
+    cmems_netcdf2csv \
+    python NetCDF2CSVWaveModel.py
+```
