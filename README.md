@@ -35,6 +35,13 @@ To convert data to the tabular `.csv` format, we use Python scripts and create d
 
 ## Usage
 
+This needs a Python environment containg the following packages
+- [`motuclient`](https://github.com/clstoulouse/motu-client-python#using-pip)
+- [`xarray`](http://xarray.pydata.org/en/stable/installing.html#instructions)
+- [`netCDF4'](https://pypi.org/project/netCDF4/)
+- [`pandas`](https://pandas.pydata.org/pandas-docs/stable/getting_started/install.html#installing-from-pypi)
+Note that it is, however,  recommended to use the Docker ([see below](#usage-with-docker)).
+
 To initiate an automated data retrieval, copy the `.sh` and `.py` files to the desired output directory, and make sure they are executable (`chmod +x  <name_file.sh>`).
 
 Set environment variables containing your CMEMS credentials:
