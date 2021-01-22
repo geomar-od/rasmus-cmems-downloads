@@ -26,24 +26,11 @@ Currently, two simulation datasets are downloaded:
 - GLOBAL_ANALYSIS_FORECAST_PHY
 - GLOBAL_ANALYSIS_FORECAST_WAV
 
-The data are downloaded as netCDF files into associated name directories:
-- `name_dir_out_nc="$(pwd)/GLOBAL_ANALYSIS_FORECAST_PHY_NC"`
-- `name_dir_out_nc="$(pwd)/GLOBAL_ANALYSIS_FORECAST_WAV_NC"`
+The data are downloaded as netCDF files into associated name directories: `GLOBAL_ANALYSIS_FORECAST_PHY_NC/` and `GLOBAL_ANALYSIS_FORECAST_WAV_NC/` in a directory that can be chosen via an input argument.
       
-For a time step a separated `.nc` file is created named according to selected model and time stamp:
+For a time step a separated `.nc` file is created named according to selected model and time stamp, e.g., `GLOBAL_ANALYSIS_FORECAST_PHY_001_24-TDS_2021-01-23_21:30:00:00.nc` or `GLOBAL_ANALYSIS_FORECAST_WAVE_001_27-TDS_2021-01-23_15:00:00:00.nc`.
 
-- `file_out=”GLOBAL_ANALYSIS_FORECAST_PHY_001_24-TDS_2021-01-23_21:30:00:00"`   
-- `file_out=”GLOBAL_ANALYSIS_FORECAST_WAVE_001_27-TDS_2021-01-23_15:00:00:00"`
-
-To convert  data to tabular `.csv` format, we use Python scripts and create a separate directories for the corresponding datasets:
-
-- `name_dir_out_csv="$(pwd)/GLOBAL_ANALYSIS_FORECAST_PHY_CSV"`
-- `name_dir_out_csv="$(pwd)/GLOBAL_ANALYSIS_FORECAST_WAV_CSV"`
-
-Analogously, the directories contain for every time step a csv file with the name according to model and time stamp:
-
-- `file_out=”GLOBAL_ANALYSIS_FORECAST_PHY_001_24-TDS_2021-01-23_21:30:00:00"`
-- `file_out=”GLOBAL_ANALYSIS_FORECAST_WAVE_001_27-TDS_2021-01-23_15:00:00:00"`
+To convert data to the tabular `.csv` format, we use Python scripts and create directories `GLOBAL_ANALYSIS_FORECAST_PHY_CSV/` and `GLOBAL_ANALYSIS_FORECAST_WAV_CSV/` which again will be located in a directory that can be chosen via a command line argument. The converted files are called, e.g., `GLOBAL_ANALYSIS_FORECAST_PHY_001_24-TDS_2021-01-23_21:30:00:00.csv` or `GLOBAL_ANALYSIS_FORECAST_WAVE_001_27-TDS_2021-01-23_15:00:00:00.csv`.
 
 
 ## Usage
@@ -58,16 +45,18 @@ export MOTU_PASSWORD="XXXXXXXXXXXXXXXXX"
 
 Then run (from the same shell)
 ```shell
-./MotuClCallPhysModel.sh 
-./MotuClCallWaveModel.sh 
+./MotuClCallPhysModel.sh <base_dir>
+./MotuClCallWaveModel.sh <base_dir>
 ```
 for retrieving current and waves data accordingly.
+With `<base_dir>`, the directory which will contain the directories for the netCDF and the CSV files can be chosen. If no `<base_dir>` is supplied, the current directory will be chosen.
 
 After the data are uploaded, run the python scripts to convert the data to `.csv` format by running:
 ```shell
-python NetCDF2CSVPhysModel.py
-python NetCDF2CSVWaveModel.py
+python NetCDF2CSVPhysModel.py --basedir <base_dir>
+python NetCDF2CSVWaveModel.py --basedir <base_dir>
 ```
+Again, `<base_dir>` indicates the directory which will contain the directories for the netCDF and the CSV files can be chosen. If no `--basedir <base_dir>` is supplied, the current directory will be chosen.
 
 ## Usage with Docker
 
@@ -89,7 +78,7 @@ docker run -it --rm \
     -e MOTU_USER -e MOTU_PASSWORD \
     -v $PWD:/work -w /work \
     cmems_motupy \
-    ./MotuClCallPhysModel.sh
+    ./MotuClCallPhysModel.sh <base_dir>
 ```
 and
 ```shell
@@ -97,20 +86,22 @@ docker run -it --rm \
     -e MOTU_USER -e MOTU_PASSWORD\
     -v $PWD:/work -w /work \
     cmems_motupy \
-    ./MotuClCallWaveModel.sh
+    ./MotuClCallWaveModel.sh <base_dir>
 ```
+Again, `<base_dir>` indicates where the data should be downloaded.
 
 And finally, run the conversion steps with
 ```shell
 docker run -it --rm \
     -v $PWD:/work -w /work \
     cmems_netcdf2csv \
-    python NetCDF2CSVPhysModel.py
+    python NetCDF2CSVPhysModel.py --basedir <base_dir>
 ```
 and
 ```shell
 docker run -it --rm \
     -v $PWD:/work -w /work \
     cmems_netcdf2csv \
-    python NetCDF2CSVWaveModel.py
+    python NetCDF2CSVWaveModel.py --basedir <base_dir>
 ```
+Again, `<base_dir>` indicates where the data should be downloaded.

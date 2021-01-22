@@ -1,7 +1,15 @@
 #!/usr/bin/env bash
 
+# read base dir (if any)
+if [ $# -eq 0 ]; then
+    echo "No arguments provided, will use $(pwd) as base dir."
+    base_dir="$(pwd)"
+else
+    base_dir="$1"
+fi
+
 # parameters
-name_dir_out_nc="$(pwd)/GLOBAL_ANALYSIS_FORECAST_PHY_NC"
+name_dir_out_nc="${base_dir}/GLOBAL_ANALYSIS_FORECAST_PHY_NC"
 name_file_out="GLOBAL_ANALYSIS_FORECAST_PHY_001_24-TDS"
 service_id="GLOBAL_ANALYSIS_FORECAST_PHY_001_024-TDS"
 product_id="global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh"

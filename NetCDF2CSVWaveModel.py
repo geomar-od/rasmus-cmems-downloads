@@ -1,13 +1,22 @@
+import argparse
+import pandas as pd
 from pathlib import Path
 import xarray as xr
-import pandas as pd
 
-# to be move to a command line argument later
-base_path = Path(".")
+# get base directory
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--basedir",
+    default=".",
+    help=("Base directory where the data dirs will be found." "\nDefaults to $PWD."),
+)
+args = parser.parse_args()
+base_dir = Path(args.basedir)
+print(base_dir)
 
 # set input and output paths
-path_in_curr = base_path / "GLOBAL_ANALYSIS_FORECAST_WAV_NC"
-path_out_curr = base_path / "GLOBAL_ANALYSIS_FORECAST_WAV_CSV"
+path_in_curr = base_dir / "GLOBAL_ANALYSIS_FORECAST_WAV_NC"
+path_out_curr = base_dir / "GLOBAL_ANALYSIS_FORECAST_WAV_CSV"
 
 # make sure output path exists
 path_out_curr.mkdir(parents=True, exist_ok=True)
