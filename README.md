@@ -2,7 +2,7 @@
 
 ## Overview
 
-Currently, automated data downloading (https://github.com/eshchekinova/example-cmems-download-automation) includes two steps: 
+Currently, automated data downloading (https://github.com/eshchekinova/example-cmems-download-automation) includes two steps:
 
 1. data download and extraction,
 
@@ -18,7 +18,7 @@ For real-time downloading from the Copernicus Ocean website (https://resources.m
 - depth
 - time span
 - variables
-      
+
 To extract the data we use the [`motuclient`](https://github.com/clstoulouse/motu-client-python/) implemented in Python and bash scripting.
 
 Currently, two simulation datasets are downloaded:
@@ -27,7 +27,7 @@ Currently, two simulation datasets are downloaded:
 - GLOBAL_ANALYSIS_FORECAST_WAV
 
 The data are downloaded as netCDF files into associated name directories: `GLOBAL_ANALYSIS_FORECAST_PHY_NC/` and `GLOBAL_ANALYSIS_FORECAST_WAV_NC/` in a directory that can be chosen via an input argument.
-      
+
 For a time step a separated `.nc` file is created named according to selected model and time stamp, e.g., `GLOBAL_ANALYSIS_FORECAST_PHY_001_24-TDS_2021-01-23_21:30:00:00.nc` or `GLOBAL_ANALYSIS_FORECAST_WAVE_001_27-TDS_2021-01-23_15:00:00:00.nc`.
 
 To convert data to the tabular `.csv` format, we use Python scripts and create directories `GLOBAL_ANALYSIS_FORECAST_PHY_CSV/` and `GLOBAL_ANALYSIS_FORECAST_WAV_CSV/` which again will be located in a directory that can be chosen via a command line argument. The converted files are called, e.g., `GLOBAL_ANALYSIS_FORECAST_PHY_001_24-TDS_2021-01-23_21:30:00:00.csv` or `GLOBAL_ANALYSIS_FORECAST_WAVE_001_27-TDS_2021-01-23_15:00:00:00.csv`.
@@ -35,7 +35,7 @@ To convert data to the tabular `.csv` format, we use Python scripts and create d
 
 ## Usage
 
-This needs a Python environment containg the following packages
+This needs a Python environment containing the following packages
 - [`motuclient`](https://github.com/clstoulouse/motu-client-python#using-pip)
 - [`xarray`](http://xarray.pydata.org/en/stable/installing.html#instructions)
 - [`netCDF4'](https://pypi.org/project/netCDF4/)
@@ -54,6 +54,12 @@ Then run (from the same shell)
 ```shell
 ./MotuClCallPhysModel.sh <base_dir>
 ./MotuClCallWaveModel.sh <base_dir>
+```
+or
+to execute download using python
+```shell
+  python MotuClUploadCMEMSPhysModel.py
+  python MotuClUploadCMEMSWavModel.py
 ```
 for retrieving current and waves data accordingly.
 With `<base_dir>`, the directory which will contain the directories for the netCDF and the CSV files can be chosen. If no `<base_dir>` is supplied, the current directory will be chosen.
@@ -94,6 +100,22 @@ docker run -it --rm \
     -v $PWD:/work -w /work \
     cmems_motupy \
     ./MotuClCallWaveModel.sh <base_dir>
+```
+Likewise, to run the download with python via docker
+```shell
+docker run -it --rm \
+    -e MOTU_USER -e MOTU_PASSWORD \
+    -v $PWD:/work -w /work \
+    cmems_motupy \
+    python MotuClUploadCMEMSPhysModel.py 
+```
+and
+```shell
+docker run -it --rm \
+    -e MOTU_USER -e MOTU_PASSWORD\
+    -v $PWD:/work -w /work \
+    cmems_motupy \
+    python MotuClUploadCMEMSPhysModel.py
 ```
 Again, `<base_dir>` indicates where the data should be downloaded.
 
