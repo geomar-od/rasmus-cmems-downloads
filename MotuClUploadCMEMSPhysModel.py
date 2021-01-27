@@ -2,7 +2,7 @@ import argparse
 import pandas as pd
 from pathlib import Path
 import xarray as xr
-import sys
+import sys, os
 
 # get base directory
 parser = argparse.ArgumentParser()
@@ -32,15 +32,15 @@ time_max = "2021-01-23 22:30:00"
 # make sure the output dir exists
 name_dir_out_nc.mkdir(parents=True, exist_ok=True)
 
-call_motu = "python3 -m motuclient \
-  --motu http://nrt.cmems-du.eu/motu-web/Motu \
-  --service-id "${service_id}" --product-id $product_id \
-  --longitude-min $lon_min --longitude-max $lon_max \
-  --latitude-min $lat_min --latitude-max $lat_max \
-  --date-min "$time_min" --date-max "$time_max" \
-  --depth-min $depth_min --depth-max $depth_max \
-  --variable uo --variable vo \
-  --out-dir "$name_dir_out_nc" --out-name "${name_file_out_nc}.nc" \
-  --user "${MOTU_USER}" --pwd "${MOTU_PASSWORD}" ""
+call_motu = "python3 -m motuclient " + \
+  "--motu http://nrt.cmems-du.eu/motu-web/Motu " + \
+  "--service-id "+service_id + " --product-id "+ product_id + \
+  " --longitude-min " + str(lon_min) + " --longitude-max " + str(lon_max) + \
+  " --latitude-min " + str(lat_min) + " --latitude-max " + str(lat_max) + \
+  " --date-min " + time_min + " --date-max " + time_max  + \
+  " --depth-min " + str(depth_min) + " --depth-max " + str(depth_max)  + \
+  " --variable " + "uo" + " --variable " + "vo" + \
+  " --out-dir " + str(name_dir_out_nc) + " --out-name " + name_file_out_nc + \
+  " --user " + "${MOTU_USER}" + " --pwd " + "${MOTU_PASSWORD}"
 
 os.system(call_motu)

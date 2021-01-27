@@ -32,7 +32,6 @@ time_max = "2021-01-24 00:00:00"
 # make sure the output dir exists
 name_dir_out_nc.mkdir(parents=True, exist_ok=True)
 
-name_file_out_nc = name_file_out + time_min.replace(":","_").replace(" ","_") + time_max.replace(":","_").replace(" ","_") + ".nc"
 call_motu = "python3 -m motuclient " + \
   "--motu http://nrt.cmems-du.eu/motu-web/Motu " + \
   "--service-id "+service_id + " --product-id "+ product_id + \
@@ -42,6 +41,6 @@ call_motu = "python3 -m motuclient " + \
   " --depth-min " + str(depth_min) + " --depth-max " + str(depth_max)  + \
   " --variable " + "VPED" + " --variable " + "VSDX" + " --variable " + "VSDY" + \
   " --out-dir " + str(name_dir_out_nc) + " --out-name " + name_file_out_nc + \
-  " --user " + MOTU_USER + " --pwd " + MOTU_PASSWORD
+  " --user " + "${MOTU_USER}" + " --pwd " + "${MOTU_PASSWORD}"
 
 os.system(call_motu)
