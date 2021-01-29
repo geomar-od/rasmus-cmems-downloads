@@ -73,6 +73,7 @@ def extract_time_stamp_from_name(name_netcdf_file, time_format):
 
 def create_or_append_zarr(names_netcdf, zarr_store, start_time, \
                           number_batches_to_append, batch_size, chunks, time_format):
+    # Conversion steps taken from Ref: https://github.com/abarciauskas-bgse/mur_sst-to-zarr/blob/master/images/netcdf-to-zarr/netcdf-to-zarr.py                      
     # open zarr store or append to an existing zarr store netcdf files
 
     # extract netcdf prefix, initial and final time steps
