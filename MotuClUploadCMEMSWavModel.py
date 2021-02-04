@@ -5,9 +5,11 @@ import sys, os
 
 def change_time_format(time_f):
     # change format from "yyyy-MM-dd HH:mm:SS" to
-    # ISO 8601 notation: {yyyy}-{MM}-{dd}T{HH}:{mm}:{SS}Z
+    # ISO 8601 notation: {yyyy}-{MM}-{dd}T{HH}:{mm}:{SS}Z or
+    # ISO 8601 date: {yyyy}-{MM}-{dd}
     time_ISO8601=f"{time_f[0:10]}T{time_f[11:19]}Z"
-    return time_ISO8601
+    time_ISO8601_short=f"{time_f[0:10]}"
+    return time_ISO8601_short
 
 if __name__ == "__main__":
 
@@ -64,10 +66,9 @@ if __name__ == "__main__":
     print(base_dir)
 
     # parameters
-    name_dir_out_nc = base_dir / "GLOBAL_ANALYSIS_FORECAST_WAV_NC"
-    name_file_prefix = "WAVE_001_027-TDS"
     service_id = "GLOBAL_ANALYSIS_FORECAST_WAV_001_027-TDS"
     product_id = "global-analysis-forecast-wav-001-027"
+    name_dir_out_nc = base_dir / product_id / "nc"
     #lon_min = -180
     #lon_max = 179.91667
     #lat_min = -80
@@ -86,24 +87,27 @@ if __name__ == "__main__":
     time_max = args.time_max
 
     # change time formats
-    timestamp_nc_min = change_time_format(time_min)
-    timestamp_nc_max = change_time_format(time_max)
+    start_day = change_time_format(time_min)
+    end_day = change_time_format(time_max)
 
     # make sure the output dir exists
     name_dir_out_nc.mkdir(parents=True, exist_ok=True)
 
-    # name netcdf file : name_file_prefix _ timestamp_nc_min _ timestamp_nc_max.nc
-    name_file_out_nc = f"{name_file_prefix}_{timestamp_nc_min}_{timestamp_nc_max}.nc"
+    variables=["VPED", "VSDX", "VSDY"]
 
-    call_motu = f"python3 -m motuclient \
-                --motu http://nrt.cmems-du.eu/motu-web/Motu \
-                --service-id {service_id} --product-id {product_id} \
-                 --longitude-min {str(lon_min)} --longitude-max {str(lon_max)} \
-                 --latitude-min {str(lat_min)} --latitude-max {str(lat_max)} \
-                 --date-min {time_min} --date-max {time_max} \
-                 --depth-min {str(depth_min)} --depth-max {str(depth_max)} \
-                 --variable VPED --variable VSDX --variable VSDY \
-                 --out-dir {str(name_dir_out_nc)} --out-name {str(name_file_out_nc)}\
-                 --user $MOTU_USER --pwd $MOTU_PASSWORD"
-
-    os.system(call_motu)
+    # call motuclient for every variable and write into output file
+    for variable_name in variables:
+       # name netcdf file : {product_id}_{varable_name}_{start_day}.nc
+       name_file_out_nc = f"{product_id}_{variable_name}_{start_day}.nc"
+       call_motu = (f"python3 -m motuclient "
+                f"--motu http://nrt.cmems-du.eu/motu-web/Motu "
+                f"--service-id {service_id} --product-id {product_id} "
+                f"--longitude-min {str(lon_min)} --longitude-max {str(lon_max)} "
+                f"--latitude-min {str(lat_min)} --latitude-max {str(lat_max)} "
+                f"--date-min {time_min} --date-max {time_max} "
+                f"--depth-min {str(depth_min)} --depth-max {str(depth_max)} "
+                f"--variable {variable_name} "
+                f"--out-dir {str(name_dir_out_nc)} --out-name {str(name_file_out_nc)} "
+                f"--user {os.environ['MOTU_USER']} --pwd {os.environ['MOTU_PASSWORD']}"
+       )
+       os.system(call_motu)
