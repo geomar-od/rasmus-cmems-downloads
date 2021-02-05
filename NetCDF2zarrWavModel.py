@@ -87,8 +87,8 @@ if __name__ == "__main__":
     #start_time = str(args.start_time)'''
 
     # set input and output paths
-    service_id = "GLOBAL_ANALYSIS_FORECAST_PHY_001_024-TDS"
-    product_id = "global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh"
+    service_id = "GLOBAL_ANALYSIS_FORECAST_WAV_001_027-TDS"
+    product_id = "global-analysis-forecast-wav-001-027"
     path_in_dir = base_dir / product_id / "nc"
     path_out_dir = base_dir / product_id
 
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     path_out_dir.mkdir(parents=True, exist_ok=True)
 
     # set list of variables
-    variables=["uo", "vo"]
+    variables=["VPED", "VSDX", "VSDY"]
 
     start_day, end_day = extract_time(sorted(path_in_dir.glob("*.nc")), product_id)
 
