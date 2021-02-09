@@ -10,8 +10,9 @@ import argparse
 from dask.distributed import Client, progress, LocalCluster
 import pandas as pd
 from pathlib import Path
-import pyarrow.parquet as pq
 import dask.array
+import pyarrow.parquet as pq
+import pyarrow as pa
 import xarray as xr
 import numpy as np
 import numcodecs
@@ -19,6 +20,7 @@ import zarr
 from datetime import datetime
 import time
 import sys
+import glob
 
 if __name__ == "__main__":
 
@@ -69,16 +71,15 @@ if __name__ == "__main__":
     # set list of variables
     variables=["uo", "vo"]
 
-    #start_day, end_day = extract_time(sorted(path_in_dir.glob("*.nc")), product_id)
-
     input_files = sorted(path_in_dir.glob(f"*{variables[0]}*.nc"))
 
     # convert files in nc directory to dataset using xarray
     nc_ds = xr.open_mfdataset(input_files, parallel=True, concat_dim="time", data_vars="minimal",combine='nested')
 
-    start_day = pd.to_datetime(nc_ds.time.min().values)
+    start_day = str(pd.to_datetime(nc_ds.time.min().values)).replace(" ","T")
     end_day = pd.to_datetime(nc_ds.time.max().values)
-    end_day =datetime(end_day.year,end_day.month,end_day.day+1)
+    end_day =str(datetime(end_day.year,end_day.month,end_day.day+1)).replace(" ","T")
+
 
     # set zarr store name
     for variable_name in variables:
@@ -89,7 +90,33 @@ if __name__ == "__main__":
         nc_ds = xr.open_mfdataset(input_files, parallel=True, concat_dim="time", data_vars="minimal",combine='nested')
 
         # define zarr store name according to convention {product_id}/{product_id}_{variable_name}_{start_day}_{end_day}.zarr
-        zar_store = f"{product_id}/{product_id}_{variable_name}_{start_day}_{end_day}.zarr"
+        zarr_store_name = f"{product_id}/zarr/{product_id}_{variable_name}_{start_day}_{end_day}.zarr"
 
         # convert dataset to zarr
-        nc_ds.to_zarr(zar_store, mode="w")
+        zarr_store = nc_ds.to_zarr(zarr_store_name, mode="w")
+
+        # get list of all variables in xarray dataset
+        zarr_array_list = list(nc_ds.variables)
+
+        # create pa_table with all variables from zarr_store class
+        table_multiple = {}
+
+        for arr in zarr_array_list:
+
+          # read array for every variables from zarr_store
+          arr_val = zarr.open(f"{zarr_store_name}/{arr}", mode='r')
+
+          table_multiple=({str(arr): arr_val})
+
+        # define parquet name according to convention {product_id}/{product_id}_{variable_name}_{start_day}_{end_day}.pq
+        pq_file_name = f"{product_id}/pq/{product_id}_{variable_name}_{start_day}_{end_day}.parquet"
+
+        # define output directory for parquet files
+        pq_dir_name = base_dir / product_id / "pq"
+
+        # make sure the output dir exists
+        pq_dir_name.mkdir(parents=True, exist_ok=True)
+
+        # write table to parquet file
+        pa_table = pa.table(table_multiple)
+        pa.parquet.write_table(pa_table, pq_file_name)
