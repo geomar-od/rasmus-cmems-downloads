@@ -1,15 +1,8 @@
 import argparse
+from datetime import datetime
 from pathlib import Path
+import re
 import sys, os
-
-
-def change_time_format(time_f):
-    # change format from "yyyy-MM-dd HH:mm:SS" to
-    # ISO 8601 notation: {yyyy}-{MM}-{dd}T{HH}:{mm}:{SS}Z
-    # ISO 8601 date: {yyyy}-{MM}-{dd}
-    time_ISO8601 = f"{time_f[0:10]}T{time_f[11:19]}Z"
-    time_ISO8601_short = f"{time_f[0:10]}"
-    return time_ISO8601_short
 
 
 if __name__ == "__main__":
@@ -44,10 +37,10 @@ if __name__ == "__main__":
         "--depth_max", default=0.4942, help=("Set boundary for lower depth layer"),
     )
     parser.add_argument(
-        "--time_min", default="2021-01-23 21:00:00", help=("Set time start"),
+        "--time_min", default="2021-01-23T21:00:00+00:00", help=("Set time start"),
     )
     parser.add_argument(
-        "--time_max", default="2021-01-23 22:30:00", help=("Set time end"),
+        "--time_max", default="2021-01-23T22:30:00+00:00", help=("Set time end"),
     )
     args = parser.parse_args()
     base_dir = Path(args.basedir)
@@ -56,14 +49,6 @@ if __name__ == "__main__":
     service_id = "GLOBAL_ANALYSIS_FORECAST_PHY_001_024-TDS"
     product_id = "global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh"
     name_dir_out_nc = base_dir / product_id / "nc"
-    # lon_min = -180
-    # lon_max = 179.91667
-    # lat_min = -80
-    # lat_max = 90
-    # depth_min = 0.493
-    # depth_max = 0.4942
-    # time_min = "2021-01-23 21:00:00"
-    # time_max = "2021-01-23 22:30:00"
     lon_min = args.longitude_min
     lon_max = args.longitude_max
     lat_min = args.latitude_min
@@ -73,12 +58,17 @@ if __name__ == "__main__":
     time_min = args.time_min
     time_max = args.time_max
 
-    # change time formats
-    start_day = change_time_format(time_min)
-    end_day = change_time_format(time_max)
-
     # make sure the output dir exists
     name_dir_out_nc.mkdir(parents=True, exist_ok=True)
+
+    # Make sure times can be parsed
+    # we use datetime.fromisoformat, which strangely cannot handle the Z
+    # notation for indicating UTC
+    time_min = re.sub("Z$", "+00:00", time_min)
+    time_max = re.sub("Z$", "+00:00", time_max)
+
+    # extract start day (needed for file name)
+    start_day = datetime.fromisoformat(time_min).strftime("%Y-%m-%d")
 
     variables = ["uo", "vo"]
 
