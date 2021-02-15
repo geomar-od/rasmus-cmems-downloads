@@ -58,13 +58,13 @@ Then run (from the same shell)
 or
 to execute download using python
 ```shell
-  python MotuClUploadCMEMSPhysModel.py
-  python MotuClUploadCMEMSWavModel.py
+  python MotuClDownloadCMEMSPhysModel.py
+  python MotuClDownloadCMEMSWavModel.py
 ```
 for retrieving current and waves data accordingly.
 With `<base_dir>`, the directory which will contain the directories for the netCDF and the CSV files can be chosen. If no `<base_dir>` is supplied, the current directory will be chosen.
 
-After the data are uploaded, run the python scripts to convert the data to `.csv` format by running:
+After the data are downloaded, run the python scripts to convert the data to `.csv` format by running:
 ```shell
 python NetCDF2CSVPhysModel.py --basedir <base_dir>
 python NetCDF2CSVWaveModel.py --basedir <base_dir>
@@ -107,7 +107,7 @@ docker run -it --rm \
     -e MOTU_USER -e MOTU_PASSWORD \
     -v $PWD:/work -w /work \
     cmems_motupy \
-    python MotuClUploadCMEMSPhysModel.py 
+    python MotuClDownloadCMEMSPhysModel.py 
 ```
 and
 ```shell
@@ -115,7 +115,7 @@ docker run -it --rm \
     -e MOTU_USER -e MOTU_PASSWORD\
     -v $PWD:/work -w /work \
     cmems_motupy \
-    python MotuClUploadCMEMSPhysModel.py
+    python MotuClDownloadCMEMSPhysModel.py
 ```
 Again, `<base_dir>` indicates where the data should be downloaded.
 
