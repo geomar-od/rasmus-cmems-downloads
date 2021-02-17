@@ -15,8 +15,8 @@ base_dir = Path(args.basedir)
 print(base_dir)
 
 # set input and output paths
-path_in_curr = base_dir / "GLOBAL_ANALYSIS_FORECAST_PHY_NC"
-path_out_curr = base_dir / "GLOBAL_ANALYSIS_FORECAST_PHY_CSV"
+path_in_curr = base_dir / "nc"
+path_out_curr = base_dir / "csv"
 
 # make sure output path exists
 path_out_curr.mkdir(parents=True, exist_ok=True)
