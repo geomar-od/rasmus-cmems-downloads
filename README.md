@@ -75,8 +75,8 @@ Again, `<base_dir>` indicates the directory which will contain the directories f
 
 First, build the container images with:
 ```shell
-docker build -t cmems_motupy - < Dockerfile_MotuCl
-docker build -t cmems_netcdf2csv - < Dockerfile_NetCDF2CSV
+docker build -t cmems_motupy - < Dockerfile_motupy
+docker build -t cmems_netcdf2csv - < Dockerfile_netcdf2csv
 ```
 
 Set environment variables containing your CMEMS credentials:
