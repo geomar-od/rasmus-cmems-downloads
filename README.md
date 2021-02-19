@@ -77,6 +77,7 @@ First, build the container images with:
 ```shell
 docker build -t cmems_motupy - < Dockerfile_MotuCl
 docker build -t cmems_netcdf2csv - < Dockerfile_NetCDF2CSV
+docker build -t cmems_netcdf2zarr - < Dockerfile_NetCDF2Zarr
 ```
 
 Set environment variables containing your CMEMS credentials:
@@ -134,3 +135,18 @@ docker run -it --rm \
     python NetCDF2CSVWaveModel.py --basedir <base_dir>
 ```
 Again, `<base_dir>` indicates where the data should be downloaded.
+
+To convert to Zarr, run
+```shell
+docker run -it --rm \
+    -v $PWD:/work -w /work \
+    cmems_netcdf2zarr \
+    python NetCDF2zarrPhysModel.py --basedir <base_dir>
+```
+and
+```shell
+docker run -it --rm \
+    -v $PWD:/work -w /work \
+    cmems_netcdf2zarr \
+    python NetCDF2zarrWaveModel.py --basedir <base_dir>
+```
