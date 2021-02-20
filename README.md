@@ -41,7 +41,7 @@ To convert data to the tabular `.csv` format, we use Python scripts and create d
 This needs a Python environment containing the following packages
 - [`motuclient`](https://github.com/clstoulouse/motu-client-python#using-pip)
 - [`xarray`](http://xarray.pydata.org/en/stable/installing.html#instructions)
-- [`netCDF4'](https://pypi.org/project/netCDF4/)
+- [`netCDF4`](https://pypi.org/project/netCDF4/)
 - [`pandas`](https://pandas.pydata.org/pandas-docs/stable/getting_started/install.html#installing-from-pypi)
 Note that it is, however,  recommended to use the Docker ([see below](#usage-with-docker)).
 
@@ -86,6 +86,9 @@ docker build \
 docker build \
     -t rasmus-cmems-downloads:netcdf2csv-latest - \
     < Dockerfile_netcdf2csv
+docker build \
+    -t rasmus-cmems-downloads:netcdf2zarr-latest - \
+    < Dockerfile_netcdf2zarr   
 ```
 or pull the pre-built images with
 ```shell
@@ -93,10 +96,16 @@ docker pull quay.io/willirath/rasmus-cmems-downloads:motupy-latest
 docker tag \
     quay.io/willirath/rasmus-cmems-downloads:motupy-latest \
     rasmus-cmems-downloads:motupy-latest
+
 docker pull quay.io/willirath/rasmus-cmems-downloads:netcdf2csv-latest
 docker tag \
     quay.io/willirath/rasmus-cmems-downloads:netcdf2csv-latest \
     rasmus-cmems-downloads:netcdf2csv-latest
+
+docker pull quay.io/willirath/rasmus-cmems-downloads:netcdf2zarr-latest
+docker tag \
+    quay.io/willirath/rasmus-cmems-downloads:netcdf2zarr-latest \
+    rasmus-cmems-downloads:netcdf2zarr-latest
 ```
 
 ### Set credentials
