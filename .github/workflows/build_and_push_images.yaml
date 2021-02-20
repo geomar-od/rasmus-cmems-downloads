@@ -14,7 +14,7 @@ on:
 env:
   GITHUB_SHA: ${{ github.sha }}
   GITHUB_REF: ${{ github.ref }}
-  DOCKER_REPO: "quay.io/willirath/cmems_rasmus_pipeline"
+  DOCKER_REPO: "quay.io/willirath/rasmus-cmems-downloads"
 
 jobs:
   build:
