@@ -1,5 +1,8 @@
 ﻿# CMEMS automated data retrieval
 
+[![build-and-push-images](https://github.com/geomar-od/rasmus-cmems-download/workflows/build-and-push-images/badge.svg?branch=main)](https://github.com/geomar-od/rasmus-cmems-download/actions?query=workflow%3Abuild-and-push-images)
+[![quay.io/willirath/rasmus-cmems-download](https://img.shields.io/badge/quay.io-build-blue)](https://quay.io/repository/willirath/rasmus-cmems-download)
+
 ## Overview
 
 Currently, automated data downloading (https://github.com/eshchekinova/example-cmems-download-automation) includes two steps:
