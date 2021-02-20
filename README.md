@@ -73,11 +73,30 @@ Again, `<base_dir>` indicates the directory which will contain the directories f
 
 ## Usage with Docker
 
-First, build the container images with:
+### Build or pull image
+
+First, build the container images with
 ```shell
-docker build -t cmems_motupy - < Dockerfile_motupy
-docker build -t cmems_netcdf2csv - < Dockerfile_netcdf2csv
+docker build \
+    -t rasmus-cmems-downloads:motupy-latest - \
+    < Dockerfile_motupy
+docker build \
+    -t rasmus-cmems-downloads:netcdf2csv-latest - \
+    < Dockerfile_netcdf2csv
 ```
+or pull the pre-built images with
+```shell
+docker pull quay.io/willirath/rasmus-cmems-downloads:motupy-latest
+docker tag \
+    quay.io/willirath/rasmus-cmems-downloads:motupy-latest \
+    rasmus-cmems-downloads:motupy-latest
+docker pull quay.io/willirath/rasmus-cmems-downloads:netcdf2csv-latest
+docker tag \
+    quay.io/willirath/rasmus-cmems-downloads:netcdf2csv-latest \
+    rasmus-cmems-downloads:netcdf2csv-latest
+```
+
+### Set credentials
 
 Set environment variables containing your CMEMS credentials:
 ```shell
@@ -85,12 +104,14 @@ export MOTU_USER="XXXXXXXXXXXXXXXX"
 export MOTU_PASSWORD="XXXXXXXXXXXXXXXXX"
 ```
 
+### Download data
+
 Then, run the download steps with
 ```shell
 docker run -it --rm \
     -e MOTU_USER -e MOTU_PASSWORD \
     -v $PWD:/work -w /work \
-    cmems_motupy \
+    rasmus-cmems-downloads:motupy-latest \
     ./MotuClCallPhysModel.sh <base_dir>
 ```
 and
@@ -98,7 +119,7 @@ and
 docker run -it --rm \
     -e MOTU_USER -e MOTU_PASSWORD\
     -v $PWD:/work -w /work \
-    cmems_motupy \
+    rasmus-cmems-downloads:motupy-latest \
     ./MotuClCallWaveModel.sh <base_dir>
 ```
 Likewise, to run the download with python via docker
@@ -106,7 +127,7 @@ Likewise, to run the download with python via docker
 docker run -it --rm \
     -e MOTU_USER -e MOTU_PASSWORD \
     -v $PWD:/work -w /work \
-    cmems_motupy \
+    rasmus-cmems-downloads:motupy-latest \
     python MotuClDownloadCMEMSPhysModel.py 
 ```
 and
@@ -114,23 +135,25 @@ and
 docker run -it --rm \
     -e MOTU_USER -e MOTU_PASSWORD\
     -v $PWD:/work -w /work \
-    cmems_motupy \
+    rasmus-cmems-downloads:motupy-latest \
     python MotuClDownloadCMEMSPhysModel.py
 ```
 Again, `<base_dir>` indicates where the data should be downloaded.
+
+### Run conversion
 
 And finally, run the conversion steps with
 ```shell
 docker run -it --rm \
     -v $PWD:/work -w /work \
-    cmems_netcdf2csv \
+    rasmus-cmems-downloads:netcdf2csv-latest \
     python NetCDF2CSVPhysModel.py --basedir <base_dir>
 ```
 and
 ```shell
 docker run -it --rm \
     -v $PWD:/work -w /work \
-    cmems_netcdf2csv \
+    rasmus-cmems-downloads:netcdf2csv-latest \
     python NetCDF2CSVWaveModel.py --basedir <base_dir>
 ```
 Again, `<base_dir>` indicates where the data should be downloaded.
