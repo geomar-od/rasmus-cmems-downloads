@@ -160,3 +160,74 @@ docker run -it --rm \
     python NetCDF2CSVWaveModel.py --basedir <base_dir>
 ```
 Again, `<base_dir>` indicates where the data should be downloaded.
+
+
+## Usage with Singularity
+
+### Load singularity module
+
+If necessary, make sure `singularity` is in your path.
+On Nesh, you currently need to run
+```shell
+module load singularity/3.5.2
+```
+
+### Build or pull image
+
+First, pull the container images with
+```shell
+singularity pull --disable-cache --dir $PWD docker://quay.io/willirath/rasmus-cmems-downloads:motupy-latest
+
+singularity pull --disable-cache --dir $PWD docker://quay.io/willirath/rasmus-cmems-downloads:netcdf2csv-latest
+```
+This will create two singularity files (ending on `sif`):
+```
+rasmus-cmems-downloads_motupy-latest.sif
+rasmus-cmems-downloads_motupy-latest.sif
+```
+
+### Set credentials
+
+Set environment variables containing your CMEMS credentials:
+```shell
+export MOTU_USER="XXXXXXXXXXXXXXXX"
+export MOTU_PASSWORD="XXXXXXXXXXXXXXXXX"
+```
+
+### Download data
+
+Then, run the download steps with
+```shell
+singularity run rasmus-cmems-downloads_motupy-latest.sif \
+    ./MotuClCallPhysModel.sh <base_dir>
+```
+and
+```shell
+singularity run rasmus-cmems-downloads_motupy-latest.sif \
+    ./MotuClCallWaveModel.sh <base_dir>
+```
+Likewise, to run the download with python via docker
+```shell
+singularity run rasmus-cmems-downloads_motupy-latest.sif \
+    python MotuClDownloadCMEMSPhysModel.py 
+```
+and
+```shell
+singularity run rasmus-cmems-downloads_motupy-latest.sif \
+    python MotuClDownloadCMEMSPhysModel.py
+```
+Again, `<base_dir>` indicates where the data should be downloaded.
+
+### Run conversion
+
+And finally, run the conversion steps with
+```shell
+singularity run rasmus-cmems-downloads_netcdf2csv-latest. \
+    python NetCDF2CSVPhysModel.py --basedir <base_dir>
+```
+and
+```shell
+singularity run rasmus-cmems-downloads_netcdf2csv-latest. \
+    python NetCDF2CSVWaveModel.py --basedir <base_dir>
+```
+Again, `<base_dir>` indicates where the data should be downloaded.
