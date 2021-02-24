@@ -49,12 +49,14 @@ if __name__ == "__main__":
         ),
     )
     parser.add_argument(
-        "--var", action="append", help="<Required> Add variable", required=True
+        "--var", action="append", help="<Required> Add variable", required=False
     )
 
     args = parser.parse_args()
     base_dir = Path(args.basedir)
-    variables = args.var
+    if args.var is not None:
+        variables = args.var
+    variables = []
     product_id = args.product_id
 
     # set input and output paths
