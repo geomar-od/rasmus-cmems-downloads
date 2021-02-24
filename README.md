@@ -33,7 +33,6 @@ The data are downloaded as netCDF files into associated name directories: `globa
 
 For a time step a separated `.nc` file is created named according to selected model, variable and start and end time stamp, e.g., `global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh_uo_2021-01-23_2021-01-24.nc` or `global-analysis-forecast-wav-001-027_VPED_2021-01-23_2021-01-24.nc`. We create daily data files for every variable.  
 
-To convert data to the tabular `.csv` format, we use Python scripts and create directories `GLOBAL_ANALYSIS_FORECAST_PHY_CSV/` and `GLOBAL_ANALYSIS_FORECAST_WAV_CSV/` which again will be located in a directory that can be chosen via a command line argument. The converted files are called, e.g., `GLOBAL_ANALYSIS_FORECAST_PHY_001_24-TDS_2021-01-23_21:30:00:00.csv` or `GLOBAL_ANALYSIS_FORECAST_WAVE_001_27-TDS_2021-01-23_15:00:00:00.csv`.
 
 
 ## Usage
