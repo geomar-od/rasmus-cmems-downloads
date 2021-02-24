@@ -20,7 +20,7 @@ jobs:
   build:
     strategy:
       matrix:
-        image_purpose: ["motupy", "netcdf2csv"]
+        image_purpose: ["motupy", "netcdf2csv", "netcdf2zarr"]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
