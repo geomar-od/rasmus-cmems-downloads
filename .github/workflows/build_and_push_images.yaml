@@ -49,6 +49,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
-          context: ${{ matrix.image_purpose }}
+          context: .
+          file: ./Dockerfile_${{ matrix.image_purpose }}
           tags: "${{env.LATEST_IMAGE}}, ${{env.CALVER_IMAGE}}"
           push: ${{ startsWith(github.ref, 'refs/heads/master')}}
