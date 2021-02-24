@@ -100,6 +100,7 @@ if __name__ == "__main__":
     # calculate number of number of days between initial and final time stamps
     num_days = (datetime.fromisoformat(time_max) - datetime.fromisoformat(time_min)).days
 
+
     # make sure the output dir exists
     name_dir_out_nc.mkdir(parents=True, exist_ok=True)
 
@@ -109,24 +110,27 @@ if __name__ == "__main__":
     # set variables
     variables = args.vars
 
-    # define list of time stamps stings with dayly time step
-    initial_times = []
     # extract start day from sting
-    start_day = datetime.fromisoformat(time_min)
-    for day in range(num_days):
-        initial_times.append((start_day + timedelta(day)).strftime("%Y-%m-%d"))
-
+    time_start = datetime.fromisoformat(time_min)
+    time_end = datetime.fromisoformat(time_max)
+    
     # call motuclient for every variable and write into daily output file
     for variable_name in variables:
-        for time_start in initial_times:
-            # name netcdf file : {product_id}_{varable_name}_{start_day}.nc
-            name_file_out_nc = f"{product_id}_{variable_name}_{time_start}.nc"
+        for day in range(num_days):
+            # set time limits corresponding to start_time and end_time in string format
+            start_time = (time_start + timedelta(day)).strftime("%Y-%m-%d")
+            end_time = (time_start + timedelta(day+1)).strftime("%Y-%m-%d")
+            # set time limits for motuclient in format "YYYY-mm-dd ss:MM:HH"
+            time_left_motu = f"{start_time} 00:00:00"
+            time_right_motu = f"{end_time} 00:00:00"
+            # name netcdf file : {product_id}_{varable_name}_{start_time}_{end_time}.nc
+            name_file_out_nc = f"{product_id}_{variable_name}_{start_time}_{end_time}.nc"
             call_motu = (f"python3 -m motuclient "
                          f"--motu http://nrt.cmems-du.eu/motu-web/Motu "
                          f"--service-id {service_id} --product-id {product_id} "
                          f"--longitude-min {str(lon_min)} --longitude-max {str(lon_max)} "
                          f"--latitude-min {str(lat_min)} --latitude-max {str(lat_max)} "
-                         f"--date-min {time_min} --date-max {time_min} "
+                         f"--date-min {time_left_motu} --date-max {time_right_motu} "
                          f"--depth-min {str(depth_min)} --depth-max {str(depth_max)} "
                          f"--variable {variable_name} "
                          f"--out-dir {str(name_dir_out_nc)} --out-name {str(name_file_out_nc)} "
