@@ -88,7 +88,7 @@ docker build \
     < Dockerfile_netcdf2csv
 docker build \
     -t rasmus-cmems-downloads:netcdf2zarr-latest - \
-    < Dockerfile_netcdf2zarr   
+    netcdf2zarr/
 ```
 or pull the pre-built images with
 ```shell
@@ -170,17 +170,10 @@ docker run -it --rm \
 ```
 Again, `<base_dir>` indicates where the data should be downloaded.
 
-To convert to Zarr, run
+To convert to Zarr, run:
 ```shell
-docker run -it --rm \
+docker run --rm \
     -v $PWD:/work -w /work \
-    cmems_netcdf2zarr \
-    python NetCDF2zarrPhysModel.py --basedir <base_dir>
-```
-and
-```shell
-docker run -it --rm \
-    -v $PWD:/work -w /work \
-    cmems_netcdf2zarr \
-    python NetCDF2zarrWaveModel.py --basedir <base_dir>
+    rasmus-cmems-downloads:netcdf2zarr-latest \
+    --basedir <base_dir> --product-id <productid> --var <var1> --var <var2> 
 ```
