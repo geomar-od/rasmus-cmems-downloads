@@ -1,0 +1,6 @@
+dask
+distributed
+netcdf4
+numpy
+xarray
+zarr

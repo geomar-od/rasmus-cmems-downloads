@@ -2,7 +2,7 @@ FROM python:3.8
 
 # install xarray, netcdf and pandas
 # TODO: cleanup cache?
-RUN python -m pip install xarray netcdf4 zarr dask distributed numpy
+RUN python -m pip install -r requirements.txt
 
 # drop this later, but we might need a bash for debugging
 # TODO: cleanup cache?
