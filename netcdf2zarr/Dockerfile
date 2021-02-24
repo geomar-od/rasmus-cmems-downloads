@@ -7,3 +7,6 @@ RUN python -m pip install xarray netcdf4 zarr dask distributed numpy
 # drop this later, but we might need a bash for debugging
 # TODO: cleanup cache?
 RUN apt update && apt install -y bash
+
+COPY NetCDF2zarrPhysModel.py .
+ENTRYPOINT python NetCDF2zarrPhysModel.py
