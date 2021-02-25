@@ -9,5 +9,6 @@ RUN python -m pip install -r requirements.txt
 # TODO: cleanup cache?
 RUN apt update && apt install -y bash
 
-COPY netcdf2zarr.py .
-ENTRYPOINT python netcdf2zarr.py
+RUN mkdir -p /opt/netcdf2zarr/
+COPY netcdf2zarr.py /opt/netcdf2zarr/.
+ENTRYPOINT ["python", "/opt/netcdf2zarr/netcdf2zarr.py"]

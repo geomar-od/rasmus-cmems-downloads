@@ -9,5 +9,6 @@ RUN python -m pip install -r requirements.txt
 # TODO: cleanup cache?
 RUN apt update && apt install -y bash
 
-COPY motupydownload.py .
-ENTRYPOINT python motupydownload.py
+RUN mkdir -p /opt/motupydownload/
+COPY motupydownload.py /opt/motupydownload/.
+ENTRYPOINT ["python", "/opt/motupydownload/motupydownload.py"]
