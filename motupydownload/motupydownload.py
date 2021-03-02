@@ -117,6 +117,10 @@ if __name__ == "__main__":
     time_start = datetime.fromisoformat(time_min)
     time_end = datetime.fromisoformat(time_max)
 
+    # Read password and username and use DUMMY string if not provided
+    MOTU_USER = os.environ.get("MOTU_USER", "NONE")
+    MOTU_PASSWORD = os.environ.get("MOTU_PASSWORD", "NONE")
+
     # call motuclient for every variable and write into daily output file
     for variable_name in variables:
         for day in range(num_days):
@@ -124,8 +128,9 @@ if __name__ == "__main__":
             start_time = (time_start + timedelta(day)).strftime("%Y-%m-%d")
             end_time = (time_start + timedelta(day + 1)).strftime("%Y-%m-%d")
             # set time limits for motuclient in format "YYYY-mm-dd ss:MM:HH"
-            time_left_motu = f"{start_time} 00:00:00"
-            time_right_motu = f"{end_time} 00:00:00"
+            time_left_motu = f"{start_time}T00:00:00"
+            time_right_motu = f"{end_time}T00:00:00"
+
             # name netcdf file : {product_id}_{varable_name}_{start_time}_{end_time}.nc
             name_file_out_nc = (
                 f"{product_id}_{variable_name}_{start_time}_{end_time}.nc"
@@ -140,7 +145,7 @@ if __name__ == "__main__":
                 f"--depth-min {str(depth_min)} --depth-max {str(depth_max)} "
                 f"--variable {variable_name} "
                 f"--out-dir {str(name_dir_out_nc)} --out-name {str(name_file_out_nc)} "
-                f"--user {os.environ['MOTU_USER']} --pwd {os.environ['MOTU_PASSWORD']}"
+                f"--user {MOTU_USER} --pwd {MOTU_PASSWORD}"
             )
             if (args.replace == True) or not nc_file_names:
                 os.system(call_motu)
