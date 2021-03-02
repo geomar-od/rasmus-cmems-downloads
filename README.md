@@ -1,42 +1,76 @@
 ﻿# CMEMS automated data retrieval
 
-[![build-and-push-images](https://github.com/geomar-od/rasmus-cmems-downloads/actions/workflows/build_and_push_images.yaml/badge.svg)](https://github.com/geomar-od/rasmus-cmems-downloads/actions/workflows/build_and_push_images.yaml)(https://github.com/geomar-od/rasmus-cmems-downloads/actions/workflows/build_and_push_images.yaml)
+[![build-and-push-images](https://github.com/geomar-od/rasmus-cmems-downloads/actions/workflows/build_and_push_images.yaml/badge.svg)](https://github.com/geomar-od/rasmus-cmems-downloads/actions/workflows/build_and_push_images.yaml)
 [![quay.io/willirath/rasmus-cmems-downloads](https://img.shields.io/badge/quay.io-build-blue)](https://quay.io/repository/willirath/rasmus-cmems-downloads)
 
 ## Overview
 
-Currently, automated data downloading (https://github.com/geomar-od/rasmus-cmems-downloads) includes two steps:
+Currently, the automated data downloading includes two steps:
 
-1. data download and extraction,
+1. data download and extraction: [`motypydownload`](motypydownload/)
 
-2. format conversion from netCDF to `zarr` format.
+2. format conversion from netCDF to [Zarr](https://zarr.readthedocs.io/en/stable/): [`netcdf2zarr`](netcdf2zarr/)
 
-In the future, we may have more conversion steps (e.g., Parquet) and / or an upload step to the True Ocean systems.
+In the future, there will be more conversion steps (e.g., from Zarr to Parquet) and / or an upload step to the systems of a collaborator.
 
 ## Description
 
-For real-time downloading from the Copernicus Ocean website (https://resources.marine.copernicus.eu/?option=com_csw&task=results) the data are selected according to user-given parameters:
+For real-time downloading from the [Copernicus Ocean website](https://resources.marine.copernicus.eu/?option=com_csw&task=results), the data are selected according to user-given parameters:
 
 - spatial domain
 - depth
 - time span
 - variables
 
-To extract the data we use the [`motuclient`](https://github.com/clstoulouse/motu-client-python/) implemented in Python and bash scripting.
+To extract the data we use the [`motuclient`](https://github.com/clstoulouse/motu-client-python/).
 
-Currently, two simulation datasets are downloaded:
+## File and directory naming
 
-- GLOBAL_ANALYSIS_FORECAST_PHY
-- GLOBAL_ANALYSIS_FORECAST_WAV
+### netCDF
 
-The data are downloaded as netCDF files into associated name directories: `global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh/nc` and `global-analysis-forecast-wav-001-027/nc` in a directory that can be chosen via an input argument.
+The data are downloaded as netCDF files into associated name directories:
+- for the [physics analysis dataset](https://resources.marine.copernicus.eu/?option=com_csw&view=details&product_id=GLOBAL_ANALYSIS_FORECAST_PHY_001_024): `global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh/nc/`
+- for the [wave analysis dataset](https://resources.marine.copernicus.eu/?option=com_csw&view=details&product_id=GLOBAL_ANALYSIS_FORECAST_WAV_001_027): `global-analysis-forecast-wav-001-027/nc/`
 
-For a time step a separated `.nc` file is created named according to selected model, variable and start and end time stamp, e.g., `global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh_uo_2021-01-23_2021-01-24.nc` or `global-analysis-forecast-wav-001-027_VPED_2021-01-23_2021-01-24.nc`. We create daily data files for every variable.  
+For each day, a separate `.nc` file is created named according to the selected, variable and start and end time stamp, e.g., `global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh_uo_2021-01-23_2021-01-24.nc` or `global-analysis-forecast-wav-001-027_VPED_2021-01-23_2021-01-24.nc`.
 
-To convert data to the tabular `.csv` format, we use Python scripts and create directories `GLOBAL_ANALYSIS_FORECAST_PHY_CSV/` and `GLOBAL_ANALYSIS_FORECAST_WAV_CSV/` which again will be located in a directory that can be chosen via a command line argument. The converted files are called, e.g., `GLOBAL_ANALYSIS_FORECAST_PHY_001_24-TDS_2021-01-23_21:30:00:00.csv` or `GLOBAL_ANALYSIS_FORECAST_WAVE_001_27-TDS_2021-01-23_15:00:00:00.csv`.
+### Zarr
+
+We'll combine all timesteps into one Zarr store per variable.
+For the [physics analysis dataset](https://resources.marine.copernicus.eu/?option=com_csw&view=details&product_id=GLOBAL_ANALYSIS_FORECAST_PHY_001_024), there would, e.g., be `global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh/zarr/global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh_uo_2021-01-01_2021-02-01.zarr/`.
+
+### General
+
+`{produc-id}/{format}/{product-id}_{variable}_{start-date}_{end-time}.{extension}`
+with
+- `product-id` being, e.g., `global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh`, or `global-analysis-forecast-wav-001-027`.
+- `format` being `nc`, `zarr`, etc.
+- `variable`, being `uo`, `vo`, etc.
+- `start-time` being interpreted as left inclusive boundary of the time interval covered by the data file / data store, and `end-time` being interpreted as the right exclusive boundary of the time interval
+- `extension` being `nc`, `zarr/`, etc.
 
 
 ## Usage
+
+### Building or pulling the container images
+
+The necessary container images can be built locally:
+```shell
+docker build -t rasmus-cmems-downloads:motupydownload-latest motupydownload/
+docker build -t rasmus-cmems-downloads:netcdf2zarr-latest netcdf2zarr/
+```
+
+Or pre-built images can be pulled:
+```shell
+docker pull quay.io/willirath/rasmus-cmems-downloads:motupydownload-latest
+docker pull quay.io/willirath/rasmus-cmems-downloads:netcdf2zarr-latest
+```
+
+### Running the containers
+
+```shell
+...
+```
 
 ### Data download and extraction
 
