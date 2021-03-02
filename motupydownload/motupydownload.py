@@ -63,9 +63,7 @@ if __name__ == "__main__":
         help=("force re-downloads"),
     )
     parser.add_argument(
-        "--vars",
-        default=["uo", "vo"],
-        help=("model parameters requested"),
+        "--var", action="append", help="<Required> Add variable", required=False
     )
     parser.add_argument(
         "--service_id",
@@ -111,7 +109,10 @@ if __name__ == "__main__":
     nc_file_names = [os.path.basename(x) for x in glob.glob(f"{name_dir_out_nc}/*")]
 
     # set variables
-    variables = args.vars
+    if args.var is not None:
+        variables = args.var
+    else:
+        variables = []
 
     # extract start day from sting
     time_start = datetime.fromisoformat(time_min)
