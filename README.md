@@ -114,6 +114,10 @@ docker run -v $PWD:/work --rm \
     --var uo --var vo --basedir /work/data
 ```
 
-## Usage with Singularity
+## Usage (with Singularity)
+
+TBD
+
+## Usage (with local Python installation)
 
 TBD
