@@ -56,12 +56,13 @@ if __name__ == "__main__":
     base_dir = Path(args.basedir)
     if args.var is not None:
         variables = args.var
-    variables = []
+    else:
+        variables = []
     product_id = args.product_id
 
     # set input and output paths
     path_in_dir = base_dir / product_id / "nc"
-    path_out_dir = base_dir / product_id
+    path_out_dir = base_dir / product_id / "zarr"
 
     # make sure the output dir exists
     path_out_dir.mkdir(parents=True, exist_ok=True)
@@ -86,7 +87,7 @@ if __name__ == "__main__":
         # define zarr store name according to convention
         # {product_id}/{product_id}_{variable_name}_{start_day}_{end_day}.zarr
         zarr_store_name = (
-            f"{product_id}/zarr/{product_id}_{variable_name}_{start_day}_{end_day}.zarr"
+            path_out_dir / f"{product_id}_{variable_name}_{start_day}_{end_day}.zarr"
         )
 
         # convert dataset to zarr
