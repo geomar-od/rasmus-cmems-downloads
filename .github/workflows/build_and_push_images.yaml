@@ -20,7 +20,7 @@ jobs:
   build:
     strategy:
       matrix:
-        image_purpose: ["motupy", "netcdf2csv"]
+        image_purpose: ["motupydownload", "netcdf2zarr"]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -49,7 +49,6 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
-          context: .
-          file: ./Dockerfile_${{ matrix.image_purpose }}
+          context: ${{ matrix.image_purpose }}
           tags: "${{env.LATEST_IMAGE}}, ${{env.CALVER_IMAGE}}"
           push: ${{ startsWith(github.ref, 'refs/heads/master')}}
