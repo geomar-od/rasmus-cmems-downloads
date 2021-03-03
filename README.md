@@ -101,6 +101,7 @@ docker run -v $PWD:/work --rm \
     rasmus-cmems-downloads:motupydownload-latest \
     --service_id GLOBAL_ANALYSIS_FORECAST_PHY_001_024-TDS \
     --product_id global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh \
+    --time_min 2021-01-01 --time_max 2021-02-01 \
     --var uo --var vo --basedir /work/data
 ```
 
@@ -116,7 +117,48 @@ docker run -v $PWD:/work --rm \
 
 ## Usage (with Singularity)
 
-TBD
+### Pulling images
+
+On Nesh, make singularity available by loading the module:
+```shell
+module load singularity/3.5.2
+```
+
+Then, pull both images:
+```shell
+singularity pull --disable-cache --dir $PWD \
+    docker://quay.io/willirath/rasmus-cmems-downloads:motupydownload-latest
+singularity pull --disable-cache --dir $PWD \
+    docker://quay.io/willirath/rasmus-cmems-downloads:netcdf2zarr-latest
+```
+
+### Download data
+
+We'll read credentials from environment variables:
+```shell
+export MOTU_USER="XXXXXXXXXXXXXXXX"
+export MOTU_PASSWORD="XXXXXXXXXXXXXXXXX"
+```
+
+```shell
+singularity run -B $PWD:/work \
+    rasmus-cmems-downloads_motupydownload-latest.sif \
+    --service_id GLOBAL_ANALYSIS_FORECAST_PHY_001_024-TDS \
+    --product_id global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh \
+    --time_min 2021-01-01 --time_max 2021-02-01 \
+    --var uo --var vo \
+    --basedir /work/data
+```
+
+### Convert to Zarr
+
+```shell
+singularity run -B $PWD:/work \
+    rasmus-cmems-downloads_netcdf2zarr-latest.sif \
+    --product_id global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh \
+    --var uo --var vo \
+    --basedir /work/data
+```
 
 ## Usage (with local Python installation)
 
