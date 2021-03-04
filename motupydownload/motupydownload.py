@@ -148,8 +148,10 @@ if __name__ == "__main__":
                 f"--out-dir {str(name_dir_out_nc)} --out-name {str(name_file_out_nc)} "
                 f"--user {MOTU_USER} --pwd {MOTU_PASSWORD}"
             )
-            if (args.replace == True) or not nc_file_names:
+            if (
+                (args.replace == True)
+                or not (Path(name_dir_out_nc) / name_file_out_nc).exists()
+            ):
                 os.system(call_motu)
             else:
-                if name_file_out_nc not in nc_file_names:
-                    os.system(call_motu)
+                print(f"skipping download of {name_file_out_nc}")
