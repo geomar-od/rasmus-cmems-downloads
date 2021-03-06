@@ -75,6 +75,11 @@ if __name__ == "__main__":
         default="global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh",
         help=("file name for model"),
     )
+    parser.add_argument(
+        "--motu",
+        default="http://nrt.cmems-du.eu/motu-web/Motu",
+        help=("Server address for motuclient"),
+    )
     args = parser.parse_args()
     base_dir = Path(args.basedir)
 
@@ -90,6 +95,7 @@ if __name__ == "__main__":
     depth_max = args.depth_max
     time_min = args.time_min
     time_max = args.time_max
+    server_address = args.motu
 
     # Make sure times can be parsed
     # we use datetime.fromisoformat, which strangely cannot handle the Z
@@ -138,7 +144,7 @@ if __name__ == "__main__":
             )
             call_motu = (
                 f"python3 -m motuclient "
-                f"--motu http://nrt.cmems-du.eu/motu-web/Motu "
+                f"--motu {server_address} "
                 f"--service-id {service_id} --product-id {product_id} "
                 f"--longitude-min {str(lon_min)} --longitude-max {str(lon_max)} "
                 f"--latitude-min {str(lat_min)} --latitude-max {str(lat_max)} "
