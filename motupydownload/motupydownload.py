@@ -1,10 +1,47 @@
 import argparse
+import multiprocessing
+import itertools
+from joblib import Parallel, delayed
 from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
 import glob
 import re
 import sys, os
+
+def call_motuclient(variable_name, day, \
+    time_start, server_address, \
+    service_id, product_id, \
+    lon_min, lon_max, \
+    lat_min, lat_max,
+    depth_min, depth_max, \
+    name_dir_out_nc, MOTU_USER, MOTU_PASSWORD):
+    # set time limits corresponding to start_time and end_time in string format
+    start_time = (time_start + timedelta(day)).strftime("%Y-%m-%d")
+    end_time = (time_start + timedelta(day + 1)).strftime("%Y-%m-%d")
+    # set time limits for motuclient in format "YYYY-mm-dd ss:MM:HH"
+    time_left_motu = f"{start_time}T00:00:00"
+    time_right_motu = f"{end_time}T00:00:00"
+
+    # name netcdf file : {product_id}_{varable_name}_{start_time}_{end_time}.nc
+    name_file_out_nc = f"{product_id}_{variable_name}_{start_time}_{end_time}.nc"
+    call_motu = (
+        f"python3 -m motuclient "
+        f"--motu {server_address} "
+        f"--service-id {service_id} --product-id {product_id} "
+        f"--longitude-min {str(lon_min)} --longitude-max {str(lon_max)} "
+        f"--latitude-min {str(lat_min)} --latitude-max {str(lat_max)} "
+        f"--date-min {time_left_motu} --date-max {time_right_motu} "
+        f"--depth-min {str(depth_min)} --depth-max {str(depth_max)} "
+        f"--variable {variable_name} "
+        f"--out-dir {str(name_dir_out_nc)} --out-name {str(name_file_out_nc)} "
+        f"--user {MOTU_USER} --pwd {MOTU_PASSWORD}"
+    )
+    if (args.replace == True) or not nc_file_names:
+        os.system(call_motu)
+    else:
+        if name_file_out_nc not in nc_file_names:
+            os.system(call_motu)
 
 if __name__ == "__main__":
 
@@ -128,34 +165,24 @@ if __name__ == "__main__":
     MOTU_USER = os.environ.get("MOTU_USER", "NONE")
     MOTU_PASSWORD = os.environ.get("MOTU_PASSWORD", "NONE")
 
-    # call motuclient for every variable and write into daily output file
-    for variable_name in variables:
-        for day in range(num_days):
-            # set time limits corresponding to start_time and end_time in string format
-            start_time = (time_start + timedelta(day)).strftime("%Y-%m-%d")
-            end_time = (time_start + timedelta(day + 1)).strftime("%Y-%m-%d")
-            # set time limits for motuclient in format "YYYY-mm-dd ss:MM:HH"
-            time_left_motu = f"{start_time}T00:00:00"
-            time_right_motu = f"{end_time}T00:00:00"
+    num_cores = multiprocessing.cpu_count()
 
-            # name netcdf file : {product_id}_{varable_name}_{start_time}_{end_time}.nc
-            name_file_out_nc = (
-                f"{product_id}_{variable_name}_{start_time}_{end_time}.nc"
-            )
-            call_motu = (
-                f"python3 -m motuclient "
-                f"--motu {server_address} "
-                f"--service-id {service_id} --product-id {product_id} "
-                f"--longitude-min {str(lon_min)} --longitude-max {str(lon_max)} "
-                f"--latitude-min {str(lat_min)} --latitude-max {str(lat_max)} "
-                f"--date-min {time_left_motu} --date-max {time_right_motu} "
-                f"--depth-min {str(depth_min)} --depth-max {str(depth_max)} "
-                f"--variable {variable_name} "
-                f"--out-dir {str(name_dir_out_nc)} --out-name {str(name_file_out_nc)} "
-                f"--user {MOTU_USER} --pwd {MOTU_PASSWORD}"
-            )
-            if (args.replace == True) or not nc_file_names:
-                os.system(call_motu)
-            else:
-                if name_file_out_nc not in nc_file_names:
-                    os.system(call_motu)
+    # generate range of days
+    days = range(num_days)
+    # define a combination consisting of variables and times for which downloading is performed
+    paramList = list(itertools.product(variables, days))
+    for variable_name, day in paramList:
+        print(variable_name, day)
+
+    # call motuclient for every variable and write into daily output file
+    processed_list = Parallel(n_jobs = num_cores)(
+        delayed(call_motuclient)(variable_name, day, \
+            time_start, server_address, \
+            service_id, product_id, \
+            lon_min, lon_max, \
+            lat_min, lat_max,
+            depth_min, depth_max, \
+            name_dir_out_nc, MOTU_USER, MOTU_PASSWORD \
+        )
+        for variable_name, day in paramList
+    )
