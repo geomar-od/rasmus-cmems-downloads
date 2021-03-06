@@ -76,7 +76,7 @@ if __name__ == "__main__":
         help=("file name for model"),
     )
     parser.add_argument(
-        "--server_address",
+        "--motu",
         default="http://nrt.cmems-du.eu/motu-web/Motu",
         help=("Server address for motuclient"),
     )
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     depth_max = args.depth_max
     time_min = args.time_min
     time_max = args.time_max
-    server_address = args.server_address
+    server_address = args.motu
 
     # Make sure times can be parsed
     # we use datetime.fromisoformat, which strangely cannot handle the Z
