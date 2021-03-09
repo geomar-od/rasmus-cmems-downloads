@@ -1,7 +1,6 @@
 import argparse
-import multiprocessing
-import itertools
-from joblib import Parallel, delayed
+from multiprocessing import Pool
+from itertools import product
 from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
@@ -9,13 +8,7 @@ import glob
 import re
 import sys, os
 
-def call_motuclient(variable_name, day, \
-    time_start, server_address, \
-    service_id, product_id, \
-    lon_min, lon_max, \
-    lat_min, lat_max,
-    depth_min, depth_max, \
-    name_dir_out_nc, MOTU_USER, MOTU_PASSWORD):
+def call_motuclient(variable_name, day):
     # set time limits corresponding to start_time and end_time in string format
     start_time = (time_start + timedelta(day)).strftime("%Y-%m-%d")
     end_time = (time_start + timedelta(day + 1)).strftime("%Y-%m-%d")
@@ -165,24 +158,12 @@ if __name__ == "__main__":
     MOTU_USER = os.environ.get("MOTU_USER", "NONE")
     MOTU_PASSWORD = os.environ.get("MOTU_PASSWORD", "NONE")
 
-    num_cores = multiprocessing.cpu_count()
-
     # generate range of days
     days = range(num_days)
     # define a combination consisting of variables and times for which downloading is performed
-    paramList = list(itertools.product(variables, days))
-    for variable_name, day in paramList:
-        print(variable_name, day)
+    #paramList = list(itertools.product(variables, days))
+    paramList = [(variable_name, day) for (variable_name, day) in product(variables, days)]
 
     # call motuclient for every variable and write into daily output file
-    processed_list = Parallel(n_jobs = num_cores)(
-        delayed(call_motuclient)(variable_name, day, \
-            time_start, server_address, \
-            service_id, product_id, \
-            lon_min, lon_max, \
-            lat_min, lat_max,
-            depth_min, depth_max, \
-            name_dir_out_nc, MOTU_USER, MOTU_PASSWORD \
-        )
-        for variable_name, day in paramList
-    )
+    with Pool(len(variables)*num_days) as p:
+      p.starmap(call_motuclient,[(variable_name, day) for (variable_name, day) in product(variables, days)])
