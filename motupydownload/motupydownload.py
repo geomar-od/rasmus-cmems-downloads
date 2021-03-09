@@ -44,73 +44,78 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--basedir",
-        default=".",
-        help=(
+        default = ".",
+        help = (
             "Base directory where the data dirs will be found." "\nDefaults to $PWD."
         ),
     )
     parser.add_argument(
         "--longitude_min",
-        default=-180,
-        help=("Set boundary for minimum of longitude"),
+        default = -180,
+        help = ("Set boundary for minimum of longitude"),
     )
     parser.add_argument(
         "--longitude_max",
-        default=-179.91667,
-        help=("Set boundary for maximum of longitude"),
+        default = -179.91667,
+        help = ("Set boundary for maximum of longitude"),
     )
     parser.add_argument(
         "--latitude_min",
-        default=-80,
-        help=("Set boundary for minimum of latitude"),
+        default = -80,
+        help = ("Set boundary for minimum of latitude"),
     )
     parser.add_argument(
         "--latitude_max",
-        default=90,
-        help=("Set boundary for maximum of latitude"),
+        default = 90,
+        help = ("Set boundary for maximum of latitude"),
     )
     parser.add_argument(
         "--depth_min",
-        default=0.493,
-        help=("Set boundary for upper depth layer"),
+        default = 0.493,
+        help = ("Set boundary for upper depth layer"),
     )
     parser.add_argument(
         "--depth_max",
-        default=0.4942,
-        help=("Set boundary for lower depth layer"),
+        default = 0.4942,
+        help = ("Set boundary for lower depth layer"),
     )
     parser.add_argument(
         "--time_min",
-        default="2021-01-23 00:00:00",
-        help=("Set time start"),
+        default = "2021-01-23 00:00:00",
+        help = ("Set time start"),
     )
     parser.add_argument(
         "--time_max",
-        default="2021-01-26 00:00:00",
-        help=("Set time end"),
+        default = "2021-01-26 00:00:00",
+        help = ("Set time end"),
     )
     parser.add_argument(
         "--replace",
-        default=False,
-        help=("force re-downloads"),
+        default = False,
+        help = ("force re-downloads"),
     )
     parser.add_argument(
-        "--var", action="append", help="<Required> Add variable", required=False
+        "--var", action = "append", help = "<Required> Add variable", required = False
     )
     parser.add_argument(
         "--service_id",
-        default="GLOBAL_ANALYSIS_FORECAST_PHY_001_024-TDS",
-        help=("product name requested"),
+        default = "GLOBAL_ANALYSIS_FORECAST_PHY_001_024-TDS",
+        help = ("product name requested"),
     )
     parser.add_argument(
         "--product_id",
-        default="global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh",
-        help=("file name for model"),
+        default = "global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh",
+        help = ("file name for model"),
     )
     parser.add_argument(
         "--motu",
-        default="http://nrt.cmems-du.eu/motu-web/Motu",
-        help=("Server address for motuclient"),
+        default = "http://nrt.cmems-du.eu/motu-web/Motu",
+        help = ("Server address for motuclient"),
+    )
+    parser.add_argument(
+        "--parallel_downloads",
+        default = 8,
+        help = ("Number of parallel downloads. Defaults to 8."),
     )
     args = parser.parse_args()
     base_dir = Path(args.basedir)
@@ -128,6 +133,7 @@ if __name__ == "__main__":
     time_min = args.time_min
     time_max = args.time_max
     server_address = args.motu
+    pool_size = args.parallel_downloads
 
     # Make sure times can be parsed
     # we use datetime.fromisoformat, which strangely cannot handle the Z
@@ -167,5 +173,5 @@ if __name__ == "__main__":
     paramList = [(variable_name, day) for (variable_name, day) in product(variables, days)]
 
     # call motuclient for every variable and write into daily output file
-    with Pool(len(variables)*num_days) as p:
+    with Pool(pool_size) as p:
       p.starmap(call_motuclient,[(variable_name, day) for (variable_name, day) in product(variables, days)])
