@@ -56,7 +56,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--longitude_max",
-        default = -179.91667,
+        default = 179.91667,
         help = ("Set boundary for maximum of longitude"),
     )
     parser.add_argument(
