@@ -1,10 +1,43 @@
 import argparse
+from multiprocessing import Pool
+from itertools import product
 from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
 import glob
 import re
 import sys, os
+
+
+def call_motuclient(variable_name, day):
+    # set time limits corresponding to start_time and end_time in string format
+    start_time = (time_start + timedelta(day)).strftime("%Y-%m-%d")
+    end_time = (time_start + timedelta(day + 1)).strftime("%Y-%m-%d")
+    # set time limits for motuclient in format "YYYY-mm-dd ss:MM:HH"
+    time_left_motu = f"{start_time}T00:00:00"
+    time_right_motu = f"{end_time}T00:00:00"
+
+    # name netcdf file : {product_id}_{varable_name}_{start_time}_{end_time}.nc
+    name_file_out_nc = f"{product_id}_{variable_name}_{start_time}_{end_time}.nc"
+    call_motu = (
+        f"python3 -m motuclient "
+        f"--motu {server_address} "
+        f"--service-id {service_id} --product-id {product_id} "
+        f"--longitude-min {str(lon_min)} --longitude-max {str(lon_max)} "
+        f"--latitude-min {str(lat_min)} --latitude-max {str(lat_max)} "
+        f"--date-min {time_left_motu} --date-max {time_right_motu} "
+        f"--depth-min {str(depth_min)} --depth-max {str(depth_max)} "
+        f"--variable {variable_name} "
+        f"--out-dir {str(name_dir_out_nc)} --out-name {str(name_file_out_nc)} "
+        f"--user {MOTU_USER} --pwd {MOTU_PASSWORD}"
+    )
+    if (args.replace == True) or not (
+        Path(name_dir_out_nc) / name_file_out_nc
+    ).exists():
+        os.system(call_motu)
+    else:
+        print(f"skipping download of {name_file_out_nc}")
+
 
 if __name__ == "__main__":
 
@@ -24,7 +57,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--longitude_max",
-        default=-179.91667,
+        default=180,
         help=("Set boundary for maximum of longitude"),
     )
     parser.add_argument(
@@ -80,6 +113,11 @@ if __name__ == "__main__":
         default="http://nrt.cmems-du.eu/motu-web/Motu",
         help=("Server address for motuclient"),
     )
+    parser.add_argument(
+        "--parallel_downloads",
+        default=8,
+        help=("Number of parallel downloads. Defaults to 8."),
+    )
     args = parser.parse_args()
     base_dir = Path(args.basedir)
 
@@ -96,6 +134,7 @@ if __name__ == "__main__":
     time_min = args.time_min
     time_max = args.time_max
     server_address = args.motu
+    pool_size = int(args.parallel_downloads)
 
     # Make sure times can be parsed
     # we use datetime.fromisoformat, which strangely cannot handle the Z
@@ -128,36 +167,17 @@ if __name__ == "__main__":
     MOTU_USER = os.environ.get("MOTU_USER", "NONE")
     MOTU_PASSWORD = os.environ.get("MOTU_PASSWORD", "NONE")
 
-    # call motuclient for every variable and write into daily output file
-    for variable_name in variables:
-        for day in range(num_days):
-            # set time limits corresponding to start_time and end_time in string format
-            start_time = (time_start + timedelta(day)).strftime("%Y-%m-%d")
-            end_time = (time_start + timedelta(day + 1)).strftime("%Y-%m-%d")
-            # set time limits for motuclient in format "YYYY-mm-dd ss:MM:HH"
-            time_left_motu = f"{start_time}T00:00:00"
-            time_right_motu = f"{end_time}T00:00:00"
+    # generate range of days
+    days = range(num_days)
+    # define a combination consisting of variables and times for which downloading is performed
+    # paramList = list(itertools.product(variables, days))
+    paramList = [
+        (variable_name, day) for (variable_name, day) in product(variables, days)
+    ]
 
-            # name netcdf file : {product_id}_{varable_name}_{start_time}_{end_time}.nc
-            name_file_out_nc = (
-                f"{product_id}_{variable_name}_{start_time}_{end_time}.nc"
-            )
-            call_motu = (
-                f"python3 -m motuclient "
-                f"--motu {server_address} "
-                f"--service-id {service_id} --product-id {product_id} "
-                f"--longitude-min {str(lon_min)} --longitude-max {str(lon_max)} "
-                f"--latitude-min {str(lat_min)} --latitude-max {str(lat_max)} "
-                f"--date-min {time_left_motu} --date-max {time_right_motu} "
-                f"--depth-min {str(depth_min)} --depth-max {str(depth_max)} "
-                f"--variable {variable_name} "
-                f"--out-dir {str(name_dir_out_nc)} --out-name {str(name_file_out_nc)} "
-                f"--user {MOTU_USER} --pwd {MOTU_PASSWORD}"
-            )
-            if (
-                (args.replace == True)
-                or not (Path(name_dir_out_nc) / name_file_out_nc).exists()
-            ):
-                os.system(call_motu)
-            else:
-                print(f"skipping download of {name_file_out_nc}")
+    # call motuclient for every variable and write into daily output file
+    with Pool(pool_size) as p:
+        p.starmap(
+            call_motuclient,
+            [(variable_name, day) for (variable_name, day) in product(variables, days)],
+        )
