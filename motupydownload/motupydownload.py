@@ -30,7 +30,7 @@ def call_motuclient(
     """Wrap call to the motuclient."""
     # Derive start and end time
     time_left = (time_min + timedelta(days=day)).strftime("%Y-%m-%dT00:00:00")
-    time_right = (time_min + timedelta(days=day + 1)).strftime("%Y-%m-%dT00:00:00")
+    time_right = (time_min + timedelta(days=day)).strftime("%Y-%m-%dT23:59:59")
 
     # name netcdf file : {product_id}_{varable_name}_{start_time}_{end_time}.nc
     name_file_out_nc = (
